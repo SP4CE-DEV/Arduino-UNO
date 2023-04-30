@@ -1,0 +1,96 @@
+// this is a draft, i know code has room for optimisation
+
+// -----VARS
+// PWM pins
+int led0 = 11;
+int led1 = 3;        
+int led2 = 5;
+int led3 = 6;
+int led4 = 9;
+int led5 = 10;
+
+// -----LEDs configs
+// led brightness
+int led0Val = 40; int led1Val = 80; int led2Val = 120; int led3Val = 160; int led4Val = 200; int led5Val = 240;
+
+// led fade direction & resolution
+ int led0FadeRes = 5; int led1FadeRes = 5; int led2FadeRes = 5; int led3FadeRes = 5; int led4FadeRes = 5; int led5FadeRes = 5;
+
+// -----LEDs database
+int ledArray[] = {led0, led1, led2, led3, led4, led5};
+int ledValArray[] = {led0Val, led1Val, led2Val, led3Val, led4Val, led5Val};
+int ledFadeResArray[] = {led0FadeRes, led1FadeRes, led2FadeRes, led3FadeRes, led4FadeRes, led5FadeRes};
+
+// sequence number
+int seqTimer = 0;
+int seqNum = 0;
+
+// ----------START
+void setup() {
+  // declare pins for output
+  for (int i = 0; i < 6; i++)
+  {
+    pinMode(ledArray[i], OUTPUT);
+  }
+}
+
+// ----------UPDATE
+void loop()
+{
+// -----BLINK SEQUENCE
+  if (seqNum == 0)
+  {
+    for (int i = 0; i < 6; i++)
+    {
+      analogWrite(ledArray[i], 0);
+    }
+    delay(75);
+    for (int i = 0; i < 6; i++)
+    {
+      analogWrite(ledArray[i], 255);
+    }
+    delay(90);
+    for (int i = 0; i < 6; i++)
+    {
+      analogWrite(ledArray[i], 0);
+    }
+    // update speed
+    delay(75);
+    // next sequence
+    seqNum = 1;
+  }
+
+// -----WAVE SEQUENCE
+  if (seqNum == 1)
+    // calc new pin brightness
+    for (int i = 0; i < 6; i++)
+    {
+      ledValArray[i] += ledFadeResArray[i];
+    }
+
+    // write new pin brightness
+    for (int i = 0; i < 6; i++)
+    {
+      analogWrite(ledArray[i], ledValArray[i]);
+    }
+
+    // control fade direction
+    for (int i = 0; i < 6; i++)
+    {
+      // reverse fade cycle on end
+      if (ledValArray[i] <= 0 || ledValArray[i] >= 255)
+      {
+        ledFadeResArray[i] = -ledFadeResArray[i];
+        if (i == 0) seqTimer += 1;
+      }
+    }
+    // next sequence
+    if (seqTimer > 7)
+    {
+      seqNum = 0; 
+      seqTimer = 0;
+    }
+
+    // update speed
+    delay(10);
+}
