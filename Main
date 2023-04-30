@@ -1,4 +1,5 @@
 // this is a draft, i know code has room for optimisation
+// written in C, with Adruino IDE default packages
 
 // -----VARS
 // PWM pins
